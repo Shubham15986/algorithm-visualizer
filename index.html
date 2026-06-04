@@ -271,6 +271,7 @@
                 document.getElementById('module-' + target).classList.add('active');
                 
                 state.activeModule = target;
+                window.dispatchEvent(new Event('resize'));
             });
         });
     </script>
