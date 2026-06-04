@@ -1,0 +1,28 @@
+#sort-canvas {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--bar-gap);
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.array-bar {
+  width: 100%;
+  background-color: var(--color-default);
+  border-radius: 3px 3px 0 0;
+  transition: background-color 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.array-bar-label {
+  color: #fff;
+  font-size: 10px;
+  margin-top: 5px;
+  font-weight: bold;
+  pointer-events: none;
+}

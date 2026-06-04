@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="modules/sorting/sorting.css">
+    <link rel="stylesheet" href="modules/pathfinding/path.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Algorithm Visualizer</div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-module="sorting">Sorting</button>
+            <button class="nav-btn" data-module="graph">Graph</button>
+            <button class="nav-btn" data-module="pathfinding">Pathfinding</button>
+        </div>
+        <div class="nav-actions">
+            <button id="theme-toggle" class="icon-btn">🌓</button>
+            <button id="share-btn" class="icon-btn">🔗</button>
+        </div>
+    </nav>
+
+    <main id="app">
+        <!-- Sorting Module -->
+        <section id="module-sorting" class="module-section active">
+            <div class="layout">
+                <!-- Controls Sidebar -->
+                <aside class="controls-panel">
+                    <div class="control-group">
+                        <label for="algo-select">Algorithm 1</label>
+                        <select id="algo-select">
+                            <option value="bubbleSort">Bubble Sort</option>
+                            <option value="selectionSort">Selection Sort</option>
+                            <option value="insertionSort">Insertion Sort</option>
+                            <option value="mergeSort">Merge Sort</option>
+                            <option value="quickSort">Quick Sort</option>
+                            <option value="heapSort">Heap Sort</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--accent); font-weight: 600;">
+                            <input type="checkbox" id="battle-mode-toggle"> ⚔️ Battle Mode
+                        </label>
+                        <select id="algo-select-2" style="display: none;">
+                            <option value="bubbleSort">Bubble Sort</option>
+                            <option value="selectionSort" selected>Selection Sort</option>
+                            <option value="insertionSort">Insertion Sort</option>
+                            <option value="mergeSort">Merge Sort</option>
+                            <option value="quickSort">Quick Sort</option>
+                            <option value="heapSort">Heap Sort</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="dataset-select">Data Source</label>
+                        <select id="dataset-select">
+                            <option value="random">Random Numbers</option>
+                            <option value="buildings">Tallest Buildings (m)</option>
+                            <option value="population">Populations (Millions)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="speed-slider">Speed</label>
+                        <input type="range" id="speed-slider" min="1" max="100" value="50">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="size-slider">Array Size</label>
+                        <input type="range" id="size-slider" min="5" max="100" value="30">
+                    </div>
+
+                    <div class="button-group">
+                        <button id="btn-play" class="btn primary">Play</button>
+                        <button id="btn-pause" class="btn">Pause</button>
+                        <button id="btn-step" class="btn">Step</button>
+                        <button id="btn-reset" class="btn">Reset</button>
+                    </div>
+
+                    <div class="control-group custom-input-group">
+                        <div class="input-row">
+                            <input type="text" id="custom-input" placeholder="e.g. 5,2,8,1,9">
+                            <button id="btn-custom" class="btn outline">Use</button>
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 10px;">
+                        <button id="btn-quiz" class="btn outline" style="grid-column: span 2;">❓ Guess Algorithm Mode</button>
+                    </div>
+                </aside>
+
+                <!-- Visualization Area -->
+                <div class="viz-area">
+                    <!-- Quiz overlay -->
+                    <div id="quiz-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10; flex-direction: column; align-items: center; justify-content: center; color: white;">
+                        <h2 style="margin-bottom: 20px;">Guess the Algorithm!</h2>
+                        <div id="quiz-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;"></div>
+                        <h3 id="quiz-feedback" style="margin-bottom: 20px;"></h3>
+                        <button id="btn-quiz-exit" class="btn outline" style="color: white; border-color: white;">Exit Quiz Mode</button>
+                    </div>
+
+                    <div id="sort-canvases-wrapper" style="display: flex; flex: 1; gap: 20px; width: 100%; height: 100%;">
+                        <div id="sort-canvas-container-1" style="flex: 1; display: flex; flex-direction: column;">
+                            <h4 id="canvas-title-1" style="text-align: center; margin-bottom: 10px; display: none;">Algorithm 1</h4>
+                            <div id="sort-canvas" style="flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: var(--bar-gap); overflow: hidden;"></div>
+                        </div>
+                        <div id="sort-canvas-container-2" style="flex: 1; display: none; flex-direction: column; position: relative;">
+                            <div id="battle-winner" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--color-sorted); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1.2rem; z-index: 5; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Winner! 🏆</div>
+                            <h4 id="canvas-title-2" style="text-align: center; margin-bottom: 10px;">Algorithm 2</h4>
+                            <div id="sort-canvas-2" style="flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: var(--bar-gap); overflow: hidden;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-bar" id="stats-bar-1">
+                        <span>Comparisons: <strong id="stat-comparisons">0</strong></span>
+                        <span>Swaps: <strong id="stat-swaps">0</strong></span>
+                        <span>Array Accesses: <strong id="stat-accesses">0</strong></span>
+                        <span>Time: <strong id="stat-time">0ms</strong></span>
+                    </div>
+
+                    <div class="stats-bar" id="stats-bar-2" style="display: none; margin-top: 10px; border-color: var(--accent);">
+                        <span>Comparisons (P2): <strong id="stat-comparisons-2">0</strong></span>
+                        <span>Swaps (P2): <strong id="stat-swaps-2">0</strong></span>
+                        <span>Array Accesses (P2): <strong id="stat-accesses-2">0</strong></span>
+                        <span>Time (P2): <strong id="stat-time-2">0ms</strong></span>
+                    </div>
+                </div>
+
+                <!-- Info Sidebar -->
+                <aside class="info-panel">
+                    <div class="panel-box pseudocode-box">
+                        <h3>Pseudocode</h3>
+                        <div id="code-display" class="code-display"></div>
+                    </div>
+                    
+                    <div class="panel-box complexity-box">
+                        <h3>Complexity</h3>
+                        <table>
+                            <tr><td>Best</td><td id="best-case"></td></tr>
+                            <tr><td>Average</td><td id="avg-case"></td></tr>
+                            <tr><td>Worst</td><td id="worst-case"></td></tr>
+                            <tr><td>Space</td><td id="space-case"></td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="panel-box live-graph-box">
+                        <h3>Operations Live Graph</h3>
+                        <canvas id="complexity-chart" width="240" height="150"></canvas>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Graph Module -->
+        <section id="module-graph" class="module-section">
+            <div class="layout">
+                <aside class="controls-panel">
+                    <div class="control-group">
+                        <label for="graph-algo-select">Algorithm</label>
+                        <select id="graph-algo-select">
+                            <option value="bfs">Breadth-First Search</option>
+                            <option value="dfs">Depth-First Search</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="graph-speed-slider">Speed</label>
+                        <input type="range" id="graph-speed-slider" min="1" max="100" value="50">
+                    </div>
+
+                    <div class="button-group">
+                        <button id="btn-graph-play" class="btn primary">Play</button>
+                        <button id="btn-graph-pause" class="btn">Pause</button>
+                        <button id="btn-graph-step" class="btn">Step</button>
+                        <button id="btn-graph-reset" class="btn">Reset</button>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <button id="btn-graph-random" class="btn outline">New Random Graph</button>
+                    </div>
+                    
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">
+                        Click on any node to set it as the starting point.
+                    </p>
+                </aside>
+
+                <div class="viz-area" style="padding: 0; background: var(--bg-secondary);">
+                    <canvas id="graph-canvas" style="width:100%; height:100%; display:block; cursor:pointer;"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pathfinding Module -->
+        <section id="module-pathfinding" class="module-section">
+            <div class="layout">
+                <aside class="controls-panel">
+                    <div class="control-group">
+                        <label for="path-algo-select">Algorithm</label>
+                        <select id="path-algo-select">
+                            <option value="dijkstra">Dijkstra's Algorithm</option>
+                            <option value="astar">A* Search</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="path-speed-slider">Speed</label>
+                        <input type="range" id="path-speed-slider" min="1" max="100" value="90">
+                    </div>
+
+                    <div class="button-group">
+                        <button id="btn-path-play" class="btn primary">Play</button>
+                        <button id="btn-path-pause" class="btn">Pause</button>
+                        <button id="btn-path-clear-path" class="btn">Clear Path</button>
+                        <button id="btn-path-clear-board" class="btn">Clear Board</button>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 10px;">
+                        <button id="btn-path-maze" class="btn outline">Generate Maze</button>
+                    </div>
+
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 20px;">
+                        <strong>Instructions:</strong>
+                        <ul style="margin-top: 5px; padding-left: 20px; display: flex; flex-direction: column; gap: 5px;">
+                            <li>Drag the <span style="color:#9B59B6; font-weight:bold;">Start</span> / <span style="color:#E74C3C; font-weight:bold;">End</span> nodes to move them</li>
+                            <li>Click & drag to draw walls</li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <div class="viz-area" style="padding: 20px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary);">
+                    <div id="grid-container"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared Scripts -->
+    <script src="shared/state.js"></script>
+    <script src="shared/utils.js"></script>
+    <script src="shared/theme.js"></script>
+    <script src="shared/animator.js"></script>
+    <script src="shared/controls.js"></script>
+
+    <!-- Sorting Scripts -->
+    <script src="modules/sorting/sorting.js"></script>
+
+    <!-- Graph Scripts -->
+    <script src="modules/graph/graph.js"></script>
+
+    <!-- Pathfinding Scripts -->
+    <script src="modules/pathfinding/path.js"></script>
+    
+    <!-- Main App Logic -->
+    <script>
+        // Simple module switching
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.target.getAttribute('data-module');
+                
+                // Update nav buttons
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Update sections
+                document.querySelectorAll('.module-section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById('module-' + target).classList.add('active');
+                
+                state.activeModule = target;
+            });
+        });
+    </script>
+</body>
+</html>

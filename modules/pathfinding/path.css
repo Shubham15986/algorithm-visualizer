@@ -1,0 +1,67 @@
+#grid-container {
+  display: grid;
+  gap: 1px;
+  background-color: var(--border);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.grid-cell {
+  background-color: #FFFFFF;
+  width: 22px;
+  height: 22px;
+  user-select: none;
+  transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+[data-theme="dark"] .grid-cell {
+  background-color: #1A1A2E;
+}
+
+.grid-cell.wall {
+  background-color: #2C3E50;
+  animation: wallAnimation 0.2s ease-out forwards;
+}
+
+.grid-cell.start {
+  background-color: #9B59B6 !important;
+  cursor: grab;
+  border-radius: 50%;
+  transform: scale(0.9);
+}
+
+.grid-cell.end {
+  background-color: #E74C3C !important;
+  cursor: grab;
+  border-radius: 50%;
+  transform: scale(0.9);
+}
+
+.grid-cell.visited {
+  background-color: rgba(133, 193, 233, 0.7);
+  animation: visitedAnimation 0.5s ease-out forwards;
+}
+
+.grid-cell.path {
+  background-color: #4CAF50;
+  animation: pathAnimation 0.5s ease-out forwards;
+}
+
+@keyframes wallAnimation {
+  0% { transform: scale(0.3); border-radius: 100%; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); border-radius: 0; }
+}
+
+@keyframes visitedAnimation {
+  0% { transform: scale(0.3); background-color: rgba(0, 0, 66, 0.75); border-radius: 100%; }
+  50% { background-color: rgba(17, 104, 217, 0.75); }
+  75% { transform: scale(1.2); background-color: rgba(0, 217, 159, 0.75); }
+  100% { transform: scale(1); background-color: rgba(133, 193, 233, 0.75); }
+}
+
+@keyframes pathAnimation {
+  0% { transform: scale(0.6); background-color: #FFD700; border-radius: 50%; }
+  50% { transform: scale(1.2); background-color: #FF8C00; }
+  100% { transform: scale(1); background-color: #4CAF50; }
+}
